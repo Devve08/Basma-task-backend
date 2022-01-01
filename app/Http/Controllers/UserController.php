@@ -4,27 +4,56 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
+
 
 class UserController extends Controller
 {
     public function register(Request $request)
     {
-        $user = User::create([
-             'name' => $request->name,
-             'email'    => $request->email,
-             'password' => $request->password,
-         ]);
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:6'
+        ]);
 
-        $token = auth('user')->login($user);
+        try {
+            if (!$validator->fails()) {
 
-        return $this->respondWithToken($token);
+                //
+                $data = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                    'secret' => env("GOOGLE_RECAPTCHA_SECRET"),
+                    'response' => $request->input('recaptcha_token'),
+                ])->json();
+
+                if ($data['success'] == true) {
+                    $user = User::create([
+                        'name' => $request->input('name'),
+                        'email'    => $request->input('email'),
+                        'password' => $request->input('password'),
+                    ]);
+                    $token = auth('user')->login($user);
+
+                    return $this->respondWithToken($token);
+                } else {
+                    return Response()->json(['error_msg' => "access Denied"]);
+                }
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                "message" => $th->getMessage()
+            ]);
+        }
     }
+
+
 
     public function login()
     {
         $credentials = request(['email', 'password']);
 
-        if (! $token = auth('user')->attempt($credentials)) {
+        if (!$token = auth('user')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -47,7 +76,7 @@ class UserController extends Controller
             'token_type'   => 'bearer',
             'expires_in'   => auth('user')->factory()->getTTL() * 60,
             'role' => 'Costumer'
-            
+
         ]);
     }
 }
