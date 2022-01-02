@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
@@ -34,7 +35,11 @@ class UserController extends Controller
                     $token = auth('user')->login($user);
 
                     return $this->respondWithToken($token);
-                } else {
+                }
+                elseif($data['success'] == false) {
+                    return Response()->json(['error_msg' => "false token"]);
+                } 
+                else {
                     return Response()->json(['error_msg' => "access denied"]);
                 }
             } else {
