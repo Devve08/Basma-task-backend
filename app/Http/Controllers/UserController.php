@@ -37,6 +37,10 @@ class UserController extends Controller
                 } else {
                     return Response()->json(['error_msg' => "access Denied"]);
                 }
+            } else {
+                return response()->json([
+                    "message" => 'Validation fails'
+                ]);
             }
         } catch (\Throwable $th) {
             return response()->json([
