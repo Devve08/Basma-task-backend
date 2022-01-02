@@ -17,16 +17,14 @@ class UserController extends Controller
             'email' => 'required|email',
             'password' => 'required|min:6'
         ]);
-
+        
         try {
             if (!$validator->fails()) {
-
-                //
                 $data = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
                     'secret' => env("GOOGLE_RECAPTCHA_SECRET"),
                     'response' => $request->input('recaptcha_token'),
                 ])->json();
-
+                
                 if ($data['success'] == true) {
                     $user = User::create([
                         'name' => $request->input('name'),
@@ -52,11 +50,9 @@ class UserController extends Controller
     public function login()
     {
         $credentials = request(['email', 'password']);
-
         if (!$token = auth('user')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
         return $this->respondWithToken($token);
     }
 
