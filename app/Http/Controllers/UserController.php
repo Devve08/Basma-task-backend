@@ -35,7 +35,7 @@ class UserController extends Controller
 
                     return $this->respondWithToken($token);
                 } else {
-                    return Response()->json(['error_msg' => "access Denied"]);
+                    return Response()->json(['error_msg' => "access denied"]);
                 }
             } else {
                 return response()->json([
