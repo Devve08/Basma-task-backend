@@ -7,7 +7,7 @@ use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
-
+use PhpParser\Node\Stmt\TryCatch;
 
 class UserController extends Controller
 {
@@ -45,6 +45,36 @@ class UserController extends Controller
             } else {
                 return response()->json([
                     "message" => 'Validation fails'
+                ]);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function addCustomer(Request $request){
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:6'
+        ]);
+
+        try {
+            if(!$validator->fails()){
+                $user = User::create([
+                    'name' => $request->input('name'),
+                    'email'    => $request->input('email'),
+                    'password' => $request->input('password'),
+                ]);
+
+                return response()->json([
+                    "message" => "User added succesfully"
+                ]);
+            } else {
+                return response()->json([
+                    'message'=> 'something went wrong'
                 ]);
             }
         } catch (\Throwable $th) {

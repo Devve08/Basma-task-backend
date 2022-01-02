@@ -52,5 +52,6 @@ Route::group(['prefix' => 'admins'], function () {
         Route::get('/lastmonth', ['App\Http\Controllers\SearchController', 'lastmonth']);
         Route::get('/lastthreemonths', ['App\Http\Controllers\SearchController', 'lastthreemonths']);
         Route::get('/lastyear', ['App\Http\Controllers\SearchController', 'lastyear']);
+        Route::post('/addcustomer', ['App\Http\Controllers\UserController', 'addCustomer']);
     });
 });
