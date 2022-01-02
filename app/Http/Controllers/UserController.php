@@ -26,7 +26,7 @@ class UserController extends Controller
                     'response' => $request->input('recaptcha_token'),
                 ])->json();
                 
-                if ($data['success'] === 'true') {
+                if ($data['success']) {
                     $user = User::create([
                         'name' => $request->input('name'),
                         'email'    => $request->input('email'),
@@ -36,7 +36,7 @@ class UserController extends Controller
 
                     return $this->respondWithToken($token);
                 }
-                elseif($data['success'] === 'false') {
+                elseif(!$data['success']) {
                     return Response()->json(['error_msg' => "false token"]);
                 } 
                 else {
